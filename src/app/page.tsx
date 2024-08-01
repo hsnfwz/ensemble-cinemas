@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, FormEvent, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 import { getMoviesByTitle } from './actions';
 
@@ -14,6 +14,7 @@ export default function HomePage () {
   const [movies, setMovies] = useState<T_Movie[]>([]);
   const [isFetchError, setIsFetchError] = useState<boolean>(false);
   const [isDisableButton, setIsDisableButton] = useState<boolean>(false);
+  const [recents, setRecents] = useState<string[]>([]);
 
   const suggestions: string[] = [
     'Spider-Man',
@@ -21,7 +22,27 @@ export default function HomePage () {
     'The Lord of the Rings',
     'Harry Potter',
     'Pirates of the Caribbean',
-  ]
+  ];
+
+  const saveSearchTerms = (cleanTitle: string) => {
+    const searchTerms: string | null = localStorage.getItem('searchTerms');
+
+    let newSearchTerms: string = '';
+
+    if (searchTerms) newSearchTerms = searchTerms + ',' + cleanTitle;
+    if (!searchTerms) newSearchTerms = cleanTitle;
+
+    localStorage.setItem('searchTerms', newSearchTerms);
+
+    const splitSearchTerms = newSearchTerms.split(',');
+
+    setRecents(splitSearchTerms);
+  }
+
+  const clearSearchTerms = () => {
+    localStorage.removeItem('searchTerms');
+    setRecents([]);
+  }
 
   const fetchMoviesNextPage = async () => {
     try {
@@ -47,6 +68,7 @@ export default function HomePage () {
       if (isFetchError) setIsFetchError(false);
 
       setMovies(fetchedMovies);
+      saveSearchTerms(cleanTitle);
     } catch (error) {
       setIsFetchError(true);
     }
@@ -79,7 +101,18 @@ export default function HomePage () {
   
   const handleSearchMovies = useCallback(debounce(searchMovies, 3000), []);
 
-  useEffect(() => handleSearchMovies(title), [title]);
+  useEffect(() => {
+    if (title.length > 0) handleSearchMovies(title);
+  }, [title]);
+
+  useEffect(() => {
+    const searchTerms: string | null = localStorage.getItem('searchTerms');
+
+    if (searchTerms) {
+      const splitSearchTerms = searchTerms.split(',');
+      setRecents(splitSearchTerms);
+    }
+  }, []);
 
   return (
     <div>
@@ -106,28 +139,54 @@ export default function HomePage () {
         <div>Sorry! We could not find any movies with the title &quot;{title}&quot;</div>
       )}
 
+      {!isFetchError && movies.length === 0 && recents.length > 0 && (
+        <div>
+          <p>Recent Searches</p>
+          <button
+            className="w-full"
+            type="button"
+            onClick={() => clearSearchTerms()}
+          >
+            Clear Recent Searches
+          </button>
+          <div>
+            {recents.map((searchTerm: string, index: number) => (
+              <div key={index}>
+                <button
+                  className="w-full"
+                  type="button"
+                  onClick={() => setTitle(searchTerm)}
+                >
+                  {searchTerm}
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {!isFetchError && movies.length === 0 && (
         <div>
-          {suggestions.map((suggestion, index) => (
-            <div key={index}>
-              <button
-                className="w-full"
-                type="button"
-                onClick={async () => {
-                  await fetchMovies(suggestion);
-                  setTitle(suggestion);
-                }}
-              >
-                {suggestion}
-              </button>
-            </div>
-          ))}
+          <p>Suggested Searches</p>
+          <div>
+            {suggestions.map((suggestion: string, index: number) => (
+              <div key={index}>
+                <button
+                  className="w-full"
+                  type="button"
+                  onClick={() => setTitle(suggestion)}
+                >
+                  {suggestion}
+                </button>
+              </div>
+            ))}
+          </div>
         </div>
       )}
 
       {!isFetchError && movies.length > 0 && (
         <div>
-          {movies.map((movie, index) => (
+          {movies.map((movie: T_Movie, index: number) => (
             <div key={index}>
               {movie.poster !== 'N/A' && (
                 <img src={movie.poster} alt={movie.title} width="200px" height="300px" />
