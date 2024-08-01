@@ -69,8 +69,6 @@ export default function HomePage () {
 
   const debounceSearch = debounce(search, 3000);
 
-  console.log(title);
-
   return (
     <div>
       <input
