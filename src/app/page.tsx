@@ -1,52 +1,48 @@
 'use client';
 
-import { useState, FormEvent } from 'react';
+import { useState, FormEvent, useEffect, useCallback } from 'react';
+
 import { getMoviesByTitle } from './actions';
 
 import { T_Movie } from './types/T_Movie';
 
+import { debounce } from './helpers';
+
 export default function HomePage () {
+  const [title, setTitle] = useState<string>('');
+  const [page, setPage] = useState<number>(1);
   const [movies, setMovies] = useState<T_Movie[]>([]);
   const [isFetchError, setIsFetchError] = useState<boolean>(false);
   const [isDisableButton, setIsDisableButton] = useState<boolean>(false);
-  const [page, setPage] = useState<number>(1);
-  const [title, setTitle] = useState<string>('');
 
-  const load = async () => {
+  const suggestions: string[] = [
+    'Spider-Man',
+    'The Lion King',
+    'The Lord of the Rings',
+    'Harry Potter',
+    'Pirates of the Caribbean',
+  ]
+
+  const fetchMoviesNextPage = async () => {
     try {
-      const nextPage = page + 1;
+      const nextPage: number = page + 1;
 
       const fetchedMovies: T_Movie[] = await getMoviesByTitle(title, nextPage);
 
       if (fetchedMovies.length < 10) setIsDisableButton(true);
       
-      const loadedMovies: T_Movie[] = [...movies, ...fetchedMovies];
+      const allMovies: T_Movie[] = [...movies, ...fetchedMovies];
 
-      setMovies(loadedMovies);
       setPage(nextPage);
+      setMovies(allMovies);
     } catch (error) {
       setIsDisableButton(true);
     }
   }
 
-  const search = async (event: FormEvent<HTMLInputElement>) => {
-    const titleValue: string = (event.target as HTMLInputElement).value;
-
-    if (titleValue.length === 0) {
-      setMovies([]);
-      setIsFetchError(false);
-      setPage(1);
-      setIsDisableButton(false);
-      return;
-    }
-
-    setPage(1);
-    setIsDisableButton(false);
-
-    setTitle(titleValue);
-
+  const fetchMovies = async (cleanTitle: string) => {
     try {
-      const fetchedMovies: T_Movie[] = await getMoviesByTitle(titleValue);
+      const fetchedMovies: T_Movie[] = await getMoviesByTitle(cleanTitle);
       
       if (isFetchError) setIsFetchError(false);
 
@@ -56,30 +52,77 @@ export default function HomePage () {
     }
   }
 
-  const debounce = (func: Function, timeout = 500) => {
-    let timer: ReturnType<typeof setTimeout>;
+  const searchMovies = async (searchTerm: string) => {    
+    const cleanTitle: string = searchTerm.trim();
 
-    return (...args: any) => {
-      clearTimeout(timer);
-      timer = setTimeout(() => {
-        func.apply(func, args);
-      }, timeout);
-    };
+    if (cleanTitle.length === 0) {
+      setPage(1);
+      setMovies([]);
+      setIsFetchError(false);
+      setIsDisableButton(false);
+      return;
+    }
+
+    setPage(1);
+    setIsDisableButton(false);
+
+    await fetchMovies(cleanTitle);
   }
 
-  const debounceSearch = debounce(search, 3000);
+  const reset = () => {
+    setTitle('');
+    setPage(1);
+    setMovies([]);
+    setIsFetchError(false);
+    setIsDisableButton(false);
+  }
+  
+  const handleSearchMovies = useCallback(debounce(searchMovies, 3000), []);
+
+  useEffect(() => handleSearchMovies(title), [title]);
 
   return (
     <div>
       <input
         className="w-full"
         type="text"
-        placeholder="Search movie by title (example: &quot;Deadpool&quot;)"
-        onInput={debounceSearch}
+        placeholder="Search movie by title (example: &quot;Spider-Man&quot;)"
+        onChange={(event) => {
+          if (isFetchError) setIsFetchError(false);
+          setTitle(event.target.value);
+        }}
+        value={title}
       />
+
+      <button
+        className="w-full"
+        type="button"
+        onClick={reset}
+      >
+        Clear
+      </button>
 
       {isFetchError && (
         <div>Sorry! We could not find any movies with the title &quot;{title}&quot;</div>
+      )}
+
+      {!isFetchError && movies.length === 0 && (
+        <div>
+          {suggestions.map((suggestion, index) => (
+            <div key={index}>
+              <button
+                className="w-full"
+                type="button"
+                onClick={async () => {
+                  await fetchMovies(suggestion);
+                  setTitle(suggestion);
+                }}
+              >
+                {suggestion}
+              </button>
+            </div>
+          ))}
+        </div>
       )}
 
       {!isFetchError && movies.length > 0 && (
@@ -100,11 +143,15 @@ export default function HomePage () {
           <button
             className="w-full"
             type="button"
-            onClick={load}
+            onClick={fetchMoviesNextPage}
             disabled={isDisableButton || page === 100}
           >
-            Load More
+            Show More
           </button>
+
+          {isDisableButton && (
+            <p>You have viewed all results!</p>
+          )}
         </div>
       )}
     </div>
