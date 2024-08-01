@@ -1,61 +1,58 @@
 'use client';
 
-import { useState, FormEvent, useRef } from 'react';
+import { useState, FormEvent } from 'react';
 import { getMoviesByTitle } from './actions';
 
 import { T_Movie } from './types/T_Movie';
-import { T_MovieError } from './types/T_MovieError';
 
 export default function HomePage () {
   const [movies, setMovies] = useState<T_Movie[]>([]);
-  const [movieError, setMovieError] = useState<T_MovieError>();
-  const [disableLoadMore, setDisableLoadMore] = useState<boolean>(false);
+  const [isFetchError, setIsFetchError] = useState<boolean>(false);
+  const [isDisableButton, setIsDisableButton] = useState<boolean>(false);
   const [page, setPage] = useState<number>(1);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const [title, setTitle] = useState<string>('');
 
   const load = async () => {
     try {
       const nextPage = page + 1;
 
-      const title: string | undefined = inputRef.current?.value;
-
-      if (!title) return;
-
       const fetchedMovies: T_Movie[] = await getMoviesByTitle(title, nextPage);
 
-      if (fetchedMovies.length < 10) setDisableLoadMore(true);
+      if (fetchedMovies.length < 10) setIsDisableButton(true);
       
       const loadedMovies: T_Movie[] = [...movies, ...fetchedMovies];
 
       setMovies(loadedMovies);
       setPage(nextPage);
     } catch (error) {
-      setDisableLoadMore(true);
+      setIsDisableButton(true);
     }
   }
 
   const search = async (event: FormEvent<HTMLInputElement>) => {
-    const title: string = (event.target as HTMLInputElement).value;
+    const titleValue: string = (event.target as HTMLInputElement).value;
 
-    if (title.length === 0) {
+    if (titleValue.length === 0) {
       setMovies([]);
-      setMovieError(undefined);
+      setIsFetchError(false);
       setPage(1);
-      setDisableLoadMore(false);
+      setIsDisableButton(false);
       return;
     }
 
     setPage(1);
-    setDisableLoadMore(false);
+    setIsDisableButton(false);
+
+    setTitle(titleValue);
 
     try {
-      const fetchedMovies: T_Movie[] = await getMoviesByTitle(title);
+      const fetchedMovies: T_Movie[] = await getMoviesByTitle(titleValue);
       
-      if (movieError) setMovieError(undefined);
+      if (isFetchError) setIsFetchError(false);
 
       setMovies(fetchedMovies);
     } catch (error) {
-      setMovieError({ title });
+      setIsFetchError(true);
     }
   }
 
@@ -72,21 +69,22 @@ export default function HomePage () {
 
   const debounceSearch = debounce(search, 3000);
 
+  console.log(title);
+
   return (
     <div>
       <input
-        ref={inputRef}
         className="w-full"
         type="text"
         placeholder="Search movie by title (example: &quot;Deadpool&quot;)"
         onInput={debounceSearch}
       />
 
-      {movieError && (
-        <div>Sorry! We could not find any movies with the title &quot;{movieError.title}&quot;</div>
+      {isFetchError && (
+        <div>Sorry! We could not find any movies with the title &quot;{title}&quot;</div>
       )}
 
-      {!movieError && movies.length > 0 && (
+      {!isFetchError && movies.length > 0 && (
         <div>
           {movies.map((movie, index) => (
             <div key={index}>
@@ -105,7 +103,7 @@ export default function HomePage () {
             className="w-full"
             type="button"
             onClick={load}
-            disabled={disableLoadMore || page === 100}
+            disabled={isDisableButton || page === 100}
           >
             Load More
           </button>
