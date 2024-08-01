@@ -40,8 +40,13 @@ export default function SearchBar () {
     if (title.length === 0) {
       setMovies([]);
       setMovieError(undefined);
+      setPage(1);
+      setDisableLoadMore(false);
       return;
     }
+
+    setPage(1);
+    setDisableLoadMore(false);
 
     try {
       const fetchedMovies: T_Movie[] = await getMoviesByTitle(title);
