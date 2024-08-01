@@ -4,9 +4,9 @@ import { T_Movie } from './types/T_Movie';
 import { T_OMDBAPIResult } from './types/T_OMDBAPIResult';
 import { T_OMDBAPIResultSearchObject } from './types/T_OMDBAPIResultSearchObject';
 
-export async function getMoviesByTitle(title: string) {
+export async function getMoviesByTitle(title: string = '', page: number = 1) {
   try {
-    const response = await fetch(`http://www.omdbapi.com/?s=${title}*&type=movie&r=json&y&apikey=${process.env.OMDB_API_KEY}`);
+    const response = await fetch(`http://www.omdbapi.com/?s=${title}*&page=${page}&type=movie&apikey=${process.env.OMDB_API_KEY}`);
     const result: T_OMDBAPIResult = await response.json();
     const movies: T_Movie[] = result.Search.map((omdbApiResultSearchObject: T_OMDBAPIResultSearchObject) => {
       return {
@@ -15,6 +15,8 @@ export async function getMoviesByTitle(title: string) {
         yearOfRelease: omdbApiResultSearchObject.Year,
       }
     });
+
+    console.log(movies);
 
     return movies;
   } catch (error) {
