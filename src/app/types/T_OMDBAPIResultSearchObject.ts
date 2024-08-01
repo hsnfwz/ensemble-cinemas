@@ -1,0 +1,7 @@
+export type T_OMDBAPIResultSearchObject = {
+  Title: string,
+  Year: string,
+  imdbID: string,
+  Type: string,
+  Poster: string
+}
