@@ -50,6 +50,7 @@ export default function HomePage () {
 
       const fetchedMovies: T_Movie[] = await getMoviesByTitle(title, nextPage);
 
+      if (isFetchError) setIsFetchError(false);
       if (fetchedMovies.length < 10) setIsDisableButton(true);
       
       const allMovies: T_Movie[] = [...movies, ...fetchedMovies];
@@ -64,8 +65,9 @@ export default function HomePage () {
   const fetchMovies = async (cleanTitle: string) => {
     try {
       const fetchedMovies: T_Movie[] = await getMoviesByTitle(cleanTitle);
-      
+
       if (isFetchError) setIsFetchError(false);
+      if (fetchedMovies.length < 10) setIsDisableButton(true);      
 
       setMovies(fetchedMovies);
       saveSearchTerms(cleanTitle);
@@ -196,6 +198,13 @@ export default function HomePage () {
               )}
               <p>{movie.title}</p>
               <p>{movie.yearOfRelease}</p>
+              <button
+                className="w-full"
+                type="button"
+                onClick={() => {}}
+              >
+                Click Me
+              </button>
             </div>
           ))}
 
@@ -209,7 +218,7 @@ export default function HomePage () {
           </button>
 
           {isDisableButton && (
-            <p>You have viewed all results!</p>
+            <p>Wow! You have viewed all movies with the title &quot;{title}&quot;</p>
           )}
         </div>
       )}
