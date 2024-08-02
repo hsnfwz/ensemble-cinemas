@@ -101,7 +101,7 @@ export default function HomePage () {
     setIsDisableButton(false);
   }
   
-  const handleSearchMovies = useCallback(debounce(searchMovies, 3000), []);
+  const handleSearchMovies = useCallback(debounce(searchMovies, 1000), []);
 
   useEffect(() => {
     if (title.length > 0) handleSearchMovies(title);
@@ -143,7 +143,7 @@ export default function HomePage () {
             onClick={reset}
             disabled={title.length === 0}
           >
-            <svg width="24px" height="24px" stroke-width="1.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" color="#fff"><path d="M6.75827 17.2426L12.0009 12M17.2435 6.75736L12.0009 12M12.0009 12L6.75827 6.75736M12.0009 12L17.2435 17.2426" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+            <svg width="24px" height="24px" strokeWidth="1.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" color="#fff"><path d="M6.75827 17.2426L12.0009 12M17.2435 6.75736L12.0009 12M12.0009 12L6.75827 6.75736M12.0009 12L17.2435 17.2426" stroke="#fff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"></path></svg>
           </button>
         </div>
       </div>
