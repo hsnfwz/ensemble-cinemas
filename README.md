@@ -14,9 +14,7 @@ Users will be able to:
 - Search movies by selecting a recent search
 - View all movies that match the given title
 
-I chose to build Project A - App as part of Ensemble Systems's interview process. It is based on the Ensemble Developer Code Sample Submission requirements.
-
-When building this project, I made the assumption that I can add a few personal touches as long as I met the technical requirements, but without adding too much than what was requested to stay within the scope.
+I chose to build Project A - App as part of Ensemble Systems's interview process. It is based on the Ensemble Developer Code Sample Submission requirements. When building this project, I made the assumption that I can add a few personal touches as long as I met the technical requirements, but without adding too much than what was requested to stay within the scope.
 
 ## Setup
 
@@ -65,6 +63,7 @@ The following technologies were used in the making of this project:
 - [TypeScript](https://www.typescriptlang.org/)
 - [React](https://react.dev/)
 - [Next.js](https://nextjs.org/)
+- [Vitest](https://vitest.dev/guide/)
 - [Vercel](https://vercel.com/home)
 - [OMDb API](https://www.omdbapi.com/)
 
@@ -81,6 +80,12 @@ Before starting the project, I selected the tech stack that would help me achiev
 
 ## Figma Design
 To view the mockup design and details about the resources used, check out the Figma file: [Figma Design - Ensemble Cinemas](https://www.figma.com/design/stO1byZvST3tHGpiBIXwTc/Ensemble-Cinemas?node-id=0-1&t=ujfRhVpYRxY711XS-1)
+
+## Backlog
+I aim to expand and improve this project by implementing the following:
+- Unit tests via Vitest
+- Animations and transitions
+- Different content pages
 
 ## Contributions
 Designed and built by Hussein Fawaz
