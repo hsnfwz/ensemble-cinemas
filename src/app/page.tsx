@@ -3,12 +3,16 @@
 import { useState, useEffect, useCallback, ChangeEvent } from 'react';
 import Image from 'next/image';
 
-import { getMoviesByTitle } from '@/app/actions';
+// actions
+import { getMovies } from '@/app/actions';
 
+// types
 import { T_Movie } from '@/app/types/T_Movie';
 
+// helpers
 import { debounce } from '@/app/helpers';
 
+// components
 import LoadIndicator from '@/app/components/LoadIndicator';
 import ButtonOutline from '@/app/components/ButtonOutline';
 import ButtonSolid from '@/app/components/ButtonSolid';
@@ -35,6 +39,7 @@ export default function HomePage () {
     'Pirates of the Caribbean',
   ];
 
+  // sets a user's search terms in local storage
   const saveSearchTerms = (cleanTitle: string) => {
     const searchTerms: string | null = localStorage.getItem('searchTerms');
 
@@ -51,18 +56,20 @@ export default function HomePage () {
     setRecents(splitSearchTerms);
   }
 
+  // removes a user's search terms in local storage
   const clearSearchTerms = () => {
     localStorage.removeItem('searchTerms');
     setRecents([]);
   }
 
+  // fetches the next page of movies (10 movies are received per request), updates the page count for future occuring fetch requests, and combines the existing movies with the new movies
   const fetchMoviesNextPage = async () => {    
     try {
       setIsLoading(true);
 
       const nextPage: number = page + 1;
 
-      const fetchedMovies: T_Movie[] = await getMoviesByTitle(title, nextPage);
+      const fetchedMovies: T_Movie[] = await getMovies(title, nextPage);
 
       if (isFetchError) setIsFetchError(false);
       if (fetchedMovies.length < 10) setIsDisableButton(true);
@@ -77,11 +84,12 @@ export default function HomePage () {
     }
   }
 
+  // fetches movies based on a given title (10 movies are received per request)
   const fetchMovies = async (cleanTitle: string) => {
     try {
       setIsLoading(true);
 
-      const fetchedMovies: T_Movie[] = await getMoviesByTitle(cleanTitle);
+      const fetchedMovies: T_Movie[] = await getMovies(cleanTitle);
 
       if (isFetchError) setIsFetchError(false);
       if (fetchedMovies.length < 10) setIsDisableButton(true);      
@@ -94,6 +102,7 @@ export default function HomePage () {
     }
   }
 
+  // formats the search term by removing trailing whitespaces and checks if a title exists before fetching movies
   const searchMovies = async (searchTerm: string) => {
     const cleanTitle: string = searchTerm.trim();
 
@@ -111,6 +120,7 @@ export default function HomePage () {
     await fetchMovies(cleanTitle);
   }
 
+  // resets the state of the page
   const reset = () => {
     setTitle('');
     setPage(1);
@@ -119,6 +129,7 @@ export default function HomePage () {
     setIsDisableButton(false);
   }
   
+  // handles searching movies with a 1 second debounce to avoid unnecessary API requests as the user types
   const handleSearchMovies = useCallback(debounce(searchMovies, 1000), []);
 
   useEffect(() => handleSearchMovies(title), [title]);
