@@ -1,8 +1,8 @@
 'use server';
 
-import { T_Movie } from './types/T_Movie';
-import { T_OMDBAPIResult } from './types/T_OMDBAPIResult';
-import { T_OMDBAPIResultSearchObject } from './types/T_OMDBAPIResultSearchObject';
+import { T_Movie } from '@/app/types/T_Movie';
+import { T_OMDBAPIResult } from '@/app/types/T_OMDBAPIResult';
+import { T_OMDBAPIResultSearchObject } from '@/app/types/T_OMDBAPIResultSearchObject';
 
 export async function getMoviesByTitle(title: string = '', page: number = 1) {
   try {    
