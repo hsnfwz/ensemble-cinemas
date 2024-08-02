@@ -15,6 +15,7 @@ export default function HomePage () {
   const [isFetchError, setIsFetchError] = useState<boolean>(false);
   const [isDisableButton, setIsDisableButton] = useState<boolean>(false);
   const [recents, setRecents] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const suggestions: string[] = [
     'Spider-Man',
@@ -30,7 +31,7 @@ export default function HomePage () {
     let newSearchTerms: string = '';
 
     if (searchTerms && searchTerms.includes(cleanTitle)) return;
-    if (searchTerms && !searchTerms.includes(cleanTitle)) newSearchTerms = searchTerms + ',' + cleanTitle;
+    if (searchTerms && !searchTerms.includes(cleanTitle)) newSearchTerms = cleanTitle + ',' + searchTerms;
     if (!searchTerms) newSearchTerms = cleanTitle;
 
     localStorage.setItem('searchTerms', newSearchTerms);
@@ -45,8 +46,10 @@ export default function HomePage () {
     setRecents([]);
   }
 
-  const fetchMoviesNextPage = async () => {
+  const fetchMoviesNextPage = async () => {    
     try {
+      setIsLoading(true);
+
       const nextPage: number = page + 1;
 
       const fetchedMovies: T_Movie[] = await getMoviesByTitle(title, nextPage);
@@ -58,6 +61,7 @@ export default function HomePage () {
 
       setPage(nextPage);
       setMovies(allMovies);
+      setIsLoading(false);
     } catch (error) {
       setIsDisableButton(true);
     }
@@ -65,6 +69,8 @@ export default function HomePage () {
 
   const fetchMovies = async (cleanTitle: string) => {
     try {
+      setIsLoading(true);
+
       const fetchedMovies: T_Movie[] = await getMoviesByTitle(cleanTitle);
 
       if (isFetchError) setIsFetchError(false);
@@ -72,12 +78,13 @@ export default function HomePage () {
 
       setMovies(fetchedMovies);
       saveSearchTerms(cleanTitle);
+      setIsLoading(false);
     } catch (error) {
       setIsFetchError(true);
     }
   }
 
-  const searchMovies = async (searchTerm: string) => {    
+  const searchMovies = async (searchTerm: string) => {
     const cleanTitle: string = searchTerm.trim();
 
     if (cleanTitle.length === 0) {
@@ -142,7 +149,7 @@ export default function HomePage () {
             className="p-4 font-roboto-bold bg-gray-700/60 rounded-full disabled:opacity-40 hover:bg-gray-700 disabled:pointer-events-none"
             type="button"
             onClick={reset}
-            disabled={title.length === 0}
+            disabled={isLoading || title.length === 0}
           >
             <svg width="24px" height="24px" strokeWidth="1.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" color="#fff"><path d="M6.75827 17.2426L12.0009 12M17.2435 6.75736L12.0009 12M12.0009 12L6.75827 6.75736M12.0009 12L17.2435 17.2426" stroke="#fff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"></path></svg>
           </button>
@@ -153,7 +160,11 @@ export default function HomePage () {
         <p className="text-center">Sorry! We could not find any movies with the title &quot;{title}&quot;</p>
       )}
 
-      {!isFetchError && movies.length === 0 && (
+      {isLoading && (
+        <div className="self-center rounded-full border-2 border-t-sky-500 border-sky-500/60 animate-spin w-6 h-6 bg-transparent"></div>
+      )}
+
+      {!isLoading && !isFetchError && movies.length === 0 && (
         <div className="relative flex flex-col gap-16">
           <div className="flex flex-col gap-8">
             <h2 className="font-roboto-bold w-full text-2xl">Suggestions</h2>
@@ -161,9 +172,10 @@ export default function HomePage () {
               {suggestions.map((suggestion: string, index: number) => (
                 <div key={index}>
                   <button
-                    className="px-4 py-2 rounded-full hover:bg-gray-700 hover:border-gray-700 bg-gray-700/60 border-2 border-gray-700/60"
+                    className="px-4 py-2 rounded-full hover:bg-gray-700 hover:border-gray-700 bg-gray-700/60 border-2 border-gray-700/60 disabled:opacity-40 disabled:pointer-events-none"
                     type="button"
                     onClick={() => setTitle(suggestion)}
+                    disabled={isLoading}
                   >
                     {suggestion}
                   </button>
@@ -181,9 +193,10 @@ export default function HomePage () {
                 {recents.map((searchTerm: string, index: number) => (
                   <div key={index}>
                     <button
-                      className="px-4 py-2 rounded-full hover:bg-gray-700 hover:border-gray-700 bg-gray-700/60 border-2 border-gray-700/60"
+                      className="px-4 py-2 rounded-full hover:bg-gray-700 hover:border-gray-700 bg-gray-700/60 border-2 border-gray-700/60 disabled:opacity-40 disabled:pointer-events-none"
                       type="button"
                       onClick={() => setTitle(searchTerm)}
+                      disabled={isLoading}
                     >
                       {searchTerm}
                     </button>
@@ -227,15 +240,19 @@ export default function HomePage () {
               </div>
             ))}
           </div>
-          <button
-            className="px-4 py-2 rounded-full hover:bg-sky-500 border-2 border-sky-500/60 self-center disabled:opacity-40 disabled:pointer-events-none"
-            type="button"
-            onClick={fetchMoviesNextPage}
-            disabled={isDisableButton || page === 100}
-          >
-            Show More
-          </button>
-
+          {!isLoading && (
+            <button
+              className="px-4 py-2 rounded-full hover:bg-sky-500 border-2 border-sky-500/60 self-center disabled:opacity-40 disabled:pointer-events-none"
+              type="button"
+              onClick={fetchMoviesNextPage}
+              disabled={isLoading || isDisableButton || page === 100}
+            >
+              Show More
+            </button>
+          )}
+          {isLoading && (
+            <div className="self-center rounded-full border-2 border-t-sky-500 border-sky-500/60 animate-spin w-6 h-6 bg-transparent"></div>
+          )}
           {isDisableButton && (
             <p className="text-center">Wow! You have viewed all movies with the title &quot;{title}&quot;</p>
           )}
