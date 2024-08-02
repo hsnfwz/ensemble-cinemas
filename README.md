@@ -78,8 +78,28 @@ Before starting the project, I selected the tech stack that would help me achiev
 - I chose Vitest for testing because it is simple to set up and use for unit testing and integrates well with Next.js.
 - For demonstration purposes, I deployed the app on Vercel. I chose Vercel because it integrates seamlessly with Next.js applications.
 
-## Figma Design
+## Design
 To view the mockup design and details about the resources used, check out the Figma file: [Figma Design - Ensemble Cinemas](https://www.figma.com/design/stO1byZvST3tHGpiBIXwTc/Ensemble-Cinemas?node-id=0-1&t=ujfRhVpYRxY711XS-1)
+
+Colours:
+- ```#000000``` Primary
+- ```#ffffff``` Secondary
+- ```#374151``` Accent 1
+- ```#6b7280``` Accent 2
+- ```#0ea5e9``` Accent 3
+
+Fonts:
+- ```Roboto``` Primary
+- ```Limelight``` Secondary
+
+The following resources were used:
+- Colours
+  - https://tailwindcss.com/docs/customizing-colors
+- Fonts
+  - https://fonts.google.com/specimen/Roboto?query=roboto
+  - https://fonts.google.com/specimen/Limelight?query=limelight
+- Icons
+  - https://iconoir.com/
 
 ## Backlog
 I aim to expand and improve this project by implementing the following:
