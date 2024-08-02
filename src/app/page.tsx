@@ -111,9 +111,7 @@ export default function HomePage () {
   
   const handleSearchMovies = useCallback(debounce(searchMovies, 1000), []);
 
-  useEffect(() => {
-    if (title.length > 0) handleSearchMovies(title);
-  }, [title]);
+  useEffect(() => handleSearchMovies(title), [title]);
 
   useEffect(() => {
     const searchTerms: string | null = localStorage.getItem('searchTerms');
