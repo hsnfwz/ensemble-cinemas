@@ -1,3 +1,37 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+body {
+  background-color: black;
+  color: white;
+}
+
+svg {
+  width: 100%;
+  height: 100%;
+}
+
+@layer base {
+  @font-face {
+    font-family: 'Limelight Regular';
+    font-display: block;
+    src: url(./fonts/Limelight-Regular.ttf) format('truetype');
+  }
+}
+
+@layer base {
+  @font-face {
+    font-family: 'Roboto Regular';
+    font-display: block;
+    src: url(./fonts/Roboto-Regular.ttf) format('truetype');
+  }
+}
+
+@layer base {
+  @font-face {
+    font-family: 'Roboto Bold';
+    font-display: block;
+    src: url(./fonts/Roboto-Bold.ttf) format('truetype');
+  }
+}
