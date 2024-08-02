@@ -29,7 +29,8 @@ export default function HomePage () {
 
     let newSearchTerms: string = '';
 
-    if (searchTerms) newSearchTerms = searchTerms + ',' + cleanTitle;
+    if (searchTerms && searchTerms.includes(cleanTitle)) return;
+    if (searchTerms && !searchTerms.includes(cleanTitle)) newSearchTerms = searchTerms + ',' + cleanTitle;
     if (!searchTerms) newSearchTerms = cleanTitle;
 
     localStorage.setItem('searchTerms', newSearchTerms);
