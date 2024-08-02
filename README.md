@@ -16,6 +16,8 @@ Users will be able to:
 
 I chose to build Project A - App as part of Ensemble Systems's interview process. It is based on the Ensemble Developer Code Sample Submission requirements.
 
+When building this project, I made the assumption that I can add a few personal touches as long as I met the technical requirements, but without adding too much than what was requested to stay within the scope.
+
 ## Setup
 
 Clone the repository:
@@ -34,11 +36,16 @@ Run the development server:
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Create a ```.env.local``` file in the root of the project and add your OMDb API key:
+```bash
+OMDB_API_KEY=your_omdb_api_key
+```
+
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result!
 
 ## Branching
 
-The following convention was used for branching:
+The following conventions were used for branching:
 
 Branch | About
 | --- | --- |
@@ -49,6 +56,7 @@ Branch | About
 | wip | for a work in progress |
 
 ## Tech Stack
+The following technologies were used in the making of this project:
 - [Figma](https://www.figma.com/)
 - HTML
 - CSS
